@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Search live shelter listings, save pets to compare later, and contact the rescue directly.">
+  <meta name="theme-color" content="#0f6e6a">
+  <title>Purr-fect Match</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="#/">Purr-fect Match</a>
+    <nav aria-label="Primary">
+      <a href="#/" data-route="search" aria-current="page">Search</a>
+      <a href="#/favorites" id="fav-link" data-route="favorites" aria-label="Favorites, 0 saved">
+        Favorites <span id="fav-count" class="count" hidden></span>
+      </a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section id="view-search">
+      <div class="hero">
+        <div class="wrap">
+          <p class="eyebrow">Pet adoption service</p>
+          <h1>Find a pet to foster or adopt</h1>
+          <p>Search live shelter listings, save the ones you want to revisit, and contact the rescue directly.</p>
+        </div>
+      </div>
+
+      <form id="search-form" class="panel wrap" aria-describedby="coverage">
+        <div class="fields">
+          <div class="field">
+            <label for="region">Area</label>
+            <select id="region" name="region">
+              <option value="es">Zaragoza, Spain</option>
+              <option value="kc">King County, Washington</option>
+              <option value="mc">Montgomery County, Maryland</option>
+              <option value="tw">Taiwan</option>
+              <option value="zip">A US ZIP code</option>
+            </select>
+          </div>
+          <div class="field" id="zip-field" hidden>
+            <label for="zip">ZIP code</label>
+            <input id="zip" name="zip" inputmode="numeric" autocomplete="postal-code" maxlength="5" pattern="\d{5}" placeholder="98101">
+          </div>
+          <div class="field">
+            <label for="species">Type</label>
+            <select id="species" name="species">
+              <option value="">Any</option>
+              <option value="Dog">Dog</option>
+              <option value="Cat">Cat</option>
+              <option value="Rabbit">Rabbit</option>
+              <option value="Bird">Bird</option>
+              <option value="Horse">Horse</option>
+              <option value="Small pet">Small pet</option>
+              <option value="Barnyard">Barnyard</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="breed">Breed</label>
+            <input id="breed" name="breed" type="search" list="breed-list" autocomplete="off" placeholder="Any breed">
+            <datalist id="breed-list"></datalist>
+          </div>
+          <fieldset class="field sex-field">
+            <legend>Sex</legend>
+            <label><input type="radio" name="sex" value="" checked> Any</label>
+            <label><input type="radio" name="sex" value="Female"> Female</label>
+            <label><input type="radio" name="sex" value="Male"> Male</label>
+          </fieldset>
+          <div class="field">
+            <label for="age">Age</label>
+            <select id="age" name="age">
+              <option value="">Any</option>
+              <option value="Baby">Baby</option>
+              <option value="Young">Young</option>
+              <option value="Adult">Adult</option>
+              <option value="Senior">Senior</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="size">Size</label>
+            <select id="size" name="size">
+              <option value="">Any</option>
+              <option value="Small">Small</option>
+              <option value="Medium">Medium</option>
+              <option value="Large">Large</option>
+              <option value="X-Large">X-Large</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="button" id="search-button" type="submit">Search</button>
+        </div>
+        <p class="fine-print" id="coverage">Listings come from public shelter data. Zaragoza and Taiwan include photos. King County and Montgomery County link to the shelter page for photos. A US ZIP only returns pets when that open dataset covers it (98101 and 20850 do today).</p>
+      </form>
+
+      <div class="wrap">
+        <p id="status" class="sr-only" aria-live="polite"></p>
+        <div id="results" aria-live="polite" aria-busy="false"></div>
+      </div>
+    </section>
+
+    <section id="view-pet" class="wrap view" hidden></section>
+    <section id="view-favorites" class="wrap view" hidden></section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>Purr-fect Match. Pet listings from public shelter data via <a href="https://petnecto.com">Petnecto</a>. Maps &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.</p>
+    </div>
+  </footer>
+
+  <dialog id="pet-dialog" aria-labelledby="dialog-title"></dialog>
+  <noscript>
+    <p class="wrap">Purr-fect Match needs JavaScript to load shelter listings.</p>
+  </noscript>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,48 +1,68 @@
-// *********************************************************************************
-// Server.js - This file is the initial starting point for the Node/Express server.
-// *********************************************************************************
+var http = require("http");
+var fs = require("fs");
+var path = require("path");
 
-// Dependencies
-// =============================================================
-var express = require("express");
-var htmlRoutes = require("./routes/html-routes.js");
-var apiRoutes = require("./routes/api-routes.js");
+var port = Number(process.env.PORT) || 8000;
+var root = path.resolve(__dirname);
 
-// Sets up the Express App
-// =============================================================
-var app = express();
-var PORT = process.env.PORT || 8000;
+var types = {
+  ".html": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+  ".ico": "image/x-icon",
+  ".json": "application/json; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8"
+};
 
-// Require our models for database syncing
-var db = require("./models")
+function safePath(urlPath) {
+  var decoded;
+  try {
+    decoded = decodeURIComponent(urlPath.split("?")[0]);
+  } catch (err) {
+    return null;
+  }
+  var requested = path.normalize(path.join(root, decoded));
+  if (requested !== root && requested.indexOf(root + path.sep) !== 0) return null;
+  return requested;
+}
 
-// Sets up the Express app to handle data parsing
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+var server = http.createServer(function (req, res) {
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    res.writeHead(405, { Allow: "GET, HEAD" });
+    res.end("Method not allowed");
+    return;
+  }
 
+  var requested = safePath(req.url || "/");
+  if (!requested) {
+    res.writeHead(400, { "Content-Type": "text/plain; charset=utf-8" });
+    res.end("Bad request");
+    return;
+  }
 
-// Set Handlebars.
-var exphbs = require("express-handlebars");
+  fs.stat(requested, function (err, stat) {
+    var filePath = requested;
+    if (!err && stat.isDirectory()) filePath = path.join(requested, "index.html");
 
-app.engine("handlebars", exphbs({ defaultLayout: "main" }));
-app.set("view engine", "handlebars");
-
-// Static directory
-app.use(express.static("public"));
-
-// Routes
-// =============================================================
-require("./routes/api-routes.js")(app);
-app.use(htmlRoutes);
-
-
-
-// Starts the server to begin listening and sync sequelize models
-// =============================================================
-db.sequelize.sync(
-  // { force: true }
-  ).then(function () {
-  app.listen(PORT, function () {
-    console.log("App listening on PORT " + PORT);
+    fs.readFile(filePath, function (readErr, body) {
+      if (readErr) {
+        res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+        res.end("Not found");
+        return;
+      }
+      var type = types[path.extname(filePath).toLowerCase()] || "application/octet-stream";
+      res.writeHead(200, { "Content-Type": type, "Cache-Control": "no-cache" });
+      res.end(req.method === "HEAD" ? undefined : body);
+    });
   });
-})
+});
+
+server.listen(port, function () {
+  console.log("Purr-fect Match is running at http://localhost:" + port);
+});
